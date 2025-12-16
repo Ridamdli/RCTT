@@ -17,15 +17,15 @@ import ModifierProduit from './ModifierProduit';
 
 function App() {
 
-  const catalogue = [
-{code :'D300', nom: 'DellInspiron300', categorie : 'Ordinateur', prixU :11000}, 
-{code :'BA25', nom: 'BallonAdidas25ml', categorie : 'Sport', prixU :600}, 
-{code :'RQT', nom: 'Raquette', categorie : 'Sport', prixU :260}, 
-] 
-const obj0= {code :'RQT', nom: 'Raquette', categorie : 'Sport', prixU :260};
+  const initialCatalogue = [
+    { code: 'D300', nom: 'DellInspiron300', categorie: 'Ordinateur', prixU: 11000 },
+    { code: 'BA25', nom: 'BallonAdidas25ml', categorie: 'Sport', prixU: 600 },
+    { code: 'RQT', nom: 'Raquette', categorie: 'Sport', prixU: 260 },
+  ];
 
-const [categorie, setCategorie]=useState();
-const [resultat, setResultat] = useState(catalogue)
+  const [categorie, setCategorie] = useState();
+  const [catalogue, setCatalogue] = useState(initialCatalogue);
+  const [resultat, setResultat] = useState(initialCatalogue);
 //Les Actions sur catalogue
 //rechercher par categorie (filtrer par categorie)
 function rechercheparCategorie(cat){
@@ -40,18 +40,36 @@ setResultat(prdsCat)
 }
 //Ajouter un produit
 function ajouterProduit(prd){
- catalogue.unshift(prd)
-setResultat(catalogue)
+  setCatalogue((prev) => [prd, ...prev]);
+  setResultat((prev) => [prd, ...prev]);
   }
 //Supprimer un produit
 function supprimerProduit(code){
-    alert(code);
-   const prdsFltres = catalogue.filter((prd)=>prd.code.toLowerCase() !==code.toLowerCase() )
-setResultat(prdsFltres)
+  // remove from both catalogue and current result list
+  const prdsFltres = catalogue.filter((prd) => prd.code.toLowerCase() !== code.toLowerCase());
+  setCatalogue(prdsFltres);
+  setResultat((prev) => prev.filter((prd) => prd.code.toLowerCase() !== code.toLowerCase()));
 
   }
   //Modifier un produit
   function updateProduit(prd){
+    // Support two call signatures: updateProduit(oldCode, newProd) or updateProduit(newProd)
+    let oldCode;
+    let newProd;
+    if (arguments.length === 2) {
+      oldCode = arguments[0];
+      newProd = arguments[1];
+    } else {
+      newProd = prd;
+      oldCode = prd.code;
+    }
+
+    const updatedCatalogue = catalogue.map((p) =>
+      p.code.toLowerCase() === oldCode.toLowerCase() ? newProd : p
+    );
+    setCatalogue(updatedCatalogue);
+    // update the currently displayed result list when applicable
+    setResultat((prev) => prev.map((p) => (p.code.toLowerCase() === oldCode.toLowerCase() ? newProd : p)));
 
   }
 
@@ -74,7 +92,7 @@ setResultat(prdsFltres)
        <hr></hr>
        <ModifierProduit fctUpdPrd={updateProduit}/>
        <hr></hr>
-      <CatalogueCompBis cata={resultat}/>
+      <CatalogueCompBis cata={resultat} onDelete={supprimerProduit} onUpdate={updateProduit} />
       {/* <div>
          <ArticleComp  code='D300' nom='DellInspiron300' categorie = 'Ordinateur'prixU ='11000'/>
          <hr></hr> 

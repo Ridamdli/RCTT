@@ -15,11 +15,17 @@ function CatalogueCompBis(props) {
             <th>Nom</th>
             <th>Categorie</th>
             <th>Prix U</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {tab.map((prod, index) => (
-           <ArticleCompBis key={index} donnees={prod} />
+            <ArticleCompBis
+              key={index}
+              donnees={prod}
+              onDelete={props.onDelete}
+              onUpdate={props.onUpdate}
+            />
           ))}
         </tbody>
       </table>
